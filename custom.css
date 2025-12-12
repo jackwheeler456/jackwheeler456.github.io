@@ -1,0 +1,113 @@
+/* Global typography and colors */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: #f7f8fb;
+}
+
+/* Brand colors */
+:root {
+  --jw-navy: #102a43;
+  --jw-navy-dark: #0b1c2b;
+  --jw-accent: #2f80ed;
+}
+
+/* Navbar */
+.jw-navbar {
+  background: linear-gradient(90deg, var(--jw-navy-dark), var(--jw-navy));
+}
+
+.jw-navbar .nav-link {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.jw-navbar .nav-link.active,
+.jw-navbar .nav-link:hover {
+  color: #f2f5ff !important;
+}
+
+/* Hero */
+.jw-hero {
+  min-height: 100vh;
+  padding-top: 90px; /* offset for fixed navbar */
+  padding-bottom: 80px;
+  background: radial-gradient(circle at top left, #2f80ed33, transparent 55%),
+    radial-gradient(circle at bottom right, #b2c4ff33, transparent 55%),
+    linear-gradient(180deg, #0b1220, #111827);
+  color: #f9fafb;
+}
+
+.jw-hero .lead,
+.jw-hero .text-muted {
+  color: #e5e7eb !important;  /* high contrast on dark hero */
+}
+
+.jw-hero .lead {
+  max-width: 38rem;
+}
+
+.jw-hero-card {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  color: #111827;
+}
+
+.jw-hero-card h2,
+.jw-hero-card h3,
+.jw-hero-card p,
+.jw-hero-card li {
+  color: #111827;
+}
+
+/* Buttons */
+.btn-accent {
+  background-color: var(--jw-accent);
+  border-color: var(--jw-accent);
+  color: #f9fafb;
+}
+
+.btn-accent:hover {
+  background-color: #2563c8;
+  border-color: #2563c8;
+}
+
+/* Sections */
+.section-title {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: var(--jw-navy);
+}
+
+/* Accent text + tags */
+.text-accent {
+  color: var(--jw-accent);
+}
+
+.jw-tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background-color: #e5edff;
+  color: var(--jw-navy);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Timeline-style blocks */
+.jw-timeline-item {
+  border-left: 3px solid #d0d7ff;
+  padding-left: 0.75rem;
+}
+
+/* Cards and utilities */
+.card {
+  border-radius: 1rem;
+}
+
+footer {
+  background-color: #f0f2f8;
+}
