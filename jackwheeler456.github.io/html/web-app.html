@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BYU Football Play Generator | Web App</title>
+
+  <style>
+    /* ---------- Global styles ---------- */
+    :root {
+      --navy: #0b1c2b;
+      --navy-soft: #111827;
+      --blue: #2563eb;
+      --blue-light: #38bdf8;
+      --bg: #020617;
+      --card: #020617;
+      --border: #1f2937;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --success: #22c55e;
+      --danger: #f97316;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background:
+        radial-gradient(circle at top, #1d4ed8 0, transparent 55%),
+        radial-gradient(circle at bottom, #0f172a 0, transparent 55%),
+        linear-gradient(180deg, #020617, #020617);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ---------- Top nav ---------- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(90deg, var(--navy), #0f172a);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .brand {
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-links a {
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+
+    .nav-links a:hover {
+      border-color: rgba(148, 163, 184, 0.7);
+      background-color: rgba(15, 23, 42, 0.7);
+    }
+
+    /* ---------- Main layout ---------- */
+    main {
+      flex: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 840px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- Generator card ---------- */
+    .card {
+      background: radial-gradient(circle at top left, #1e293b 0, #020617 60%);
+      border-radius: 1.25rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+      padding: 1.75rem 1.5rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 0, rgba(56, 189, 248, 0.25), transparent 50%),
+        radial-gradient(circle at 90% 100%, rgba(37, 99, 235, 0.25), transparent 55%);
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--blue-light);
+      margin-bottom: 0.35rem;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.45rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 32rem;
+    }
+
+    /* ---------- Controls ---------- */
+    .controls {
+      margin-top: 1.3rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+    }
+
+    .select-group label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .select-group select {
+      background-color: #020617;
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .checkbox-group input {
+      accent-color: var(--blue);
+    }
+
+    /* ---------- Button ---------- */
+    .btn {
+      margin-top: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid #38bdf8;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: #f9fafb;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .btn span.icon {
+      font-size: 1rem;
+    }
+
+    /* ---------- Output play ---------- */
+    .play-output {
+      margin-top: 1.5rem;
+      padding: 1rem 0.9rem;
+      border-radius: 1rem;
+      background-color: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .play-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .play-main {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .play-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .tag.pass {
+      border-color: #38bdf8;
+      color: #e0f2fe;
+    }
+
+    .tag.run {
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
+
+    .tag.trick {
+      border-color: #f97316;
+      color: #ffedd5;
+    }
+
+    .play-detail {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .play-note {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      margin-top: 0.4rem;
+    }
+
+    /* ---------- Diagram ---------- */
+    .diagram-card {
+      background: linear-gradient(145deg, #020617, #030712);
+      border-radius: 1.25rem;
+      border: 1px solid var(--border);
+      padding: 1.5rem 1.25rem;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+      align-self: flex-start;
+    }
+
+    .diagram-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .field {
+      position: relative;
+      background: radial-gradient(circle at top, #082f49, #020617);
+      border-radius: 0.9rem;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.75rem 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .yard-lines {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      color: #9ca3af;
+      opacity: 0.9;
+      margin-bottom: 0.4rem;
+    }
+
+    .field-center {
+      position: relative;
+      height: 120px;
+      border-radius: 0.6rem;
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+    }
+
+    .unit-row {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .unit-row.qb-row {
+      bottom: 18px;
+    }
+
+    .unit-row.skill-row {
+      bottom: 55px;
+    }
+
+    .unit-row.ol-row {
+      bottom: 5px;
+    }
+
+    .player {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid #e5e7eb;
+      background-color: #1e40af;
+      position: relative;
+    }
+
+    .player-qb {
+      background-color: #facc15;
+    }
+
+    .player-label {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .motion-arrow,
+    .route-arrow {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px dashed rgba(248, 250, 252, 0.5);
+      pointer-events: none;
+    }
+
+    .motion-arrow::after,
+    .route-arrow::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .motion-arrow {
+      border-color: rgba(56, 189, 248, 0.6);
+    }
+
+    .motion-arrow::after {
+      border-width: 5px 0 5px 7px;
+      border-color: transparent transparent transparent rgba(56, 189, 248, 0.9);
+      right: -3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .route-arrow {
+      border-color: rgba(96, 165, 250, 0.7);
+    }
+
+    .route-arrow::after {
+      border-width: 0 5px 7px 5px;
+      border-color: transparent transparent rgba(96, 165, 250, 0.95) transparent;
+      left: 50%;
+      top: -4px;
+      transform: translateX(-50%);
+    }
+
+    .diagram-caption {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .diagram-caption strong {
+      color: #e5e7eb;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem 2rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <div class="brand">BYU Football · Play Generator</div>
+      <nav class="nav-links">
+        <a href="index.html">Professional Site</a>
+        <a href="scratch.html">Scratch Page</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left: Generator + play text -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="eyebrow">Web App · Single Page</div>
+        <h1 class="title">Random Cougar Play Call</h1>
+        <p class="subtitle">
+          Build a play with one click. The app combines formation, motion, concept,
+          and situation to generate a BYU-style call you might hear in the huddle.
+        </p>
+
+        <!-- Controls -->
+        <div class="controls">
+          <div class="select-group">
+            <label for="tendency">Tendency</label>
+            <select id="tendency">
+              <option value="balanced">Balanced</option>
+              <option value="pass">Pass Heavy</option>
+              <option value="run">Run Heavy</option>
+              <option value="trick">Trick Play</option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label for="downDistance">Down &amp; Distance</label>
+            <select id="downDistance">
+              <option value="any">Any</option>
+              <option value="short">3rd &amp; Short</option>
+              <option value="medium">2nd &amp; Medium</option>
+              <option value="long">3rd &amp; Long</option>
+              <option value="redzone">Red Zone</option>
+            </select>
+          </div>
+
+          <label class="checkbox-group">
+            <input type="checkbox" id="isHome" checked />
+            Home game at LES
+          </label>
+        </div>
+
+        <!-- Generate button -->
+        <button class="btn" id="generateBtn">
+          <span class="icon">▶</span>
+          <span>Draw a Play</span>
+        </button>
+
+        <!-- Output -->
+        <div class="play-output" id="playOutput" aria-live="polite">
+          <div class="play-label">Play Call</div>
+          <div class="play-main" id="playMain">
+            Trips Right · Inside Zone · "Cougar Tempo"
+          </div>
+
+          <div class="play-tags" id="playTags">
+            <span class="tag run">Run</span>
+            <span class="tag">3rd &amp; Short</span>
+            <span class="tag">Field Left</span>
+          </div>
+
+          <div class="play-detail" id="playDetail">
+            OL works double teams to the second level while the QB reads the backside edge.
+            Ideal in short-yardage or tempo situations to keep the chains moving.
+          </div>
+
+          <div class="play-note" id="playNote">
+            LES crowd behind you on the near hash — snap it quick before the defense
+            can rotate.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: simple visual diagram that updates labels (not to scale) -->
+    <aside class="diagram-card">
+      <div class="diagram-title">Quick Look · Offensive Shell</div>
+
+      <div class="field">
+        <div class="yard-lines">
+          <span>Boundary</span>
+          <span>Field</span>
+        </div>
+        <div class="field-center">
+          <!-- Skill row -->
+          <div class="unit-row skill-row">
+            <div class="player" id="xReceiver">
+              <div class="player-label">X</div>
+            </div>
+            <div class="player" id="slotReceiver">
+              <div class="player-label">Slot</div>
+            </div>
+            <div class="player" id="zReceiver">
+              <div class="player-label">Z</div>
+            </div>
+          </div>
+
+          <!-- QB row -->
+          <div class="unit-row qb-row">
+            <div class="player player-qb">
+              <div class="player-label">QB</div>
+            </div>
+            <div class="player" id="rb">
+              <div class="player-label">RB</div>
+            </div>
+          </div>
+
+          <!-- OL row -->
+          <div class="unit-row ol-row">
+            <div class="player">
+              <div class="player-label">LT</div>
+            </div>
+            <div class="player">
+              <div class="player-label">LG</div>
+            </div>
+            <div class="player">
+              <div class="player-label">C</div>
+            </div>
+            <div class="player">
+              <div class="player-label">RG</div>
+            </div>
+            <div class="player">
+              <div class="player-label">RT</div>
+            </div>
+          </div>
+
+          <!-- Motion + route hints -->
+          <div class="motion-arrow" id="motionArrow" style="left: 18%; top: 22%;"></div>
+          <div class="route-arrow" id="routeArrow" style="left: 70%; top: 35%;"></div>
+        </div>
+      </div>
+
+      <p class="diagram-caption" id="diagramCaption">
+        <strong>Trips Right, Field Side.</strong> Slot in short motion across the formation
+        with the Z running a deep over route. Diagram is a simplified look at where the
+        concept is stressing the defense.
+      </p>
+    </aside>
+  </main>
+
+  <footer>
+    BYU Football Play Generator · Built as a single-page web app with HTML, CSS, and
+    JavaScript.
+  </footer>
+
+  <script>
+    // ---------- Data sets for the generator ----------
+
+    const formations = [
+      "Trips Right",
+      "Trips Left",
+      "Doubles Right",
+      "Doubles Left",
+      "Bunch Right",
+      "Bunch Left",
+      "Ace (2x2)",
+      "Empty Right",
+      "Empty Left"
+    ];
+
+    const motions = [
+      "Jet motion from the field slot",
+      "Orbit motion from the boundary",
+      "Short in-and-out motion by the slot",
+      "RB fast motion to empty",
+      "Tight end shift and settle",
+      "No motion (static look)"
+    ];
+
+    const runConcepts = [
+      "Inside Zone",
+      "Wide Zone",
+      "Counter GT",
+      "Power",
+      "Draw",
+      "QB Keep off Zone Read"
+    ];
+
+    const passConcepts = [
+      "Four Verts",
+      "Mesh",
+      "Flood",
+      "Levels",
+      "Switch Verticals",
+      "Dagger",
+      "Y Cross",
+      "Stick"
+    ];
+
+    const trickConcepts = [
+      "Double Pass",
+      "Reverse Pass",
+      "Flea Flicker",
+      "End-Around",
+      "Fake Screen & Go"
+    ];
+
+    const directions = [
+      "to the field",
+      "to the boundary",
+      "into the short side",
+      "to the wide side",
+      "back to the QB on a throwback"
+    ];
+
+    const playNames = [
+      "Cougar Tempo",
+      "Blue Storm",
+      "Lavell Special",
+      "Y Mountain",
+      "Royal Shift",
+      "Provo Pressure",
+      "ROC Thunder",
+      "Victory Trail"
+    ];
+
+    const downDistanceLabels = {
+      any: "Any Down",
+      short: "3rd & Short",
+      medium: "2nd & Medium",
+      long: "3rd & Long",
+      redzone: "Red Zone"
+    };
+
+    // ---------- Utility functions ----------
+
+    function rand(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function chooseConcept(tendency) {
+      if (tendency === "pass") return { type: "pass", concept: rand(passConcepts) };
+      if (tendency === "run") return { type: "run", concept: rand(runConcepts) };
+      if (tendency === "trick") return { type: "trick", concept: rand(trickConcepts) };
+
+      // Balanced
+      const roll = Math.random();
+      if (roll < 0.45) return { type: "run", concept: rand(runConcepts) };
+      if (roll < 0.9) return { type: "pass", concept: rand(passConcepts) };
+      return { type: "trick", concept: rand(trickConcepts) };
+    }
+
+    function chooseDirection(conceptType) {
+      if (conceptType === "run") {
+        return rand([
+          "to the field",
+          "to the boundary",
+          "to the tight end side",
+          "to the open side"
+        ]);
+      }
+      if (conceptType === "pass") {
+        return rand([
+          "attacking the field hash",
+          "hitting the boundary window",
+          "stressing the deep middle",
+          "flooding the wide side"
+        ]);
+      }
+      // Trick
+      return rand(directions);
+    }
+
+    function buildSituationText(downDistance, isHome) {
+      const base = downDistanceLabels[downDistance] || "Any Down";
+      const crowdText = isHome
+        ? "LES crowd rising as the play develops."
+        : "hostile road crowd trying to disrupt the cadence.";
+      if (downDistance === "redzone") {
+        return base + " · " + "Tight field, windows are smaller, " + crowdText;
+      }
+      return base + " · " + crowdText;
+    }
+
+    function buildDetail(conceptType, concept, motion, direction, downDistance) {
+  let detail = "";
+
+  if (conceptType === "run") {
+    detail =
+      "OL works double teams and climbs to the second level while the RB presses " +
+      direction +
+      ". ";
+    detail +=
+      motion.includes("Jet") || motion.includes("Orbit")
+        ? "Motion is designed to widen the overhang player and open interior seams. "
+        : "Backfield action is meant to hold the linebackers just long enough for a crease. ";
+
+    if (downDistance === "short") {
+      detail += "Great call when you need 2–3 yards to move the chains.";
+    } else if (downDistance === "long") {
+      detail += "Can catch the defense in a light box if they’re expecting pass.";
+    } else if (downDistance === "redzone") {
+      detail += "Pad level and double teams are critical with compressed space.";
+    } else {
+      detail += "Keeps the defense honest and sets up later play-action shots.";
+    }
+
+  } else if (conceptType === "pass") {
+    detail =
+      concept +
+      " concept is " +
+      direction +
+      " with progression built to stress the conflict defender. ";
+
+    if (motion.includes("No motion")) {
+      detail += "Static look helps the QB diagnose coverage pre-snap. ";
+    } else {
+      detail += "Motion helps the QB confirm man vs zone and adjust the read. ";
+    }
+
+    if (downDistance === "long") {
+      detail += "Designed to create an explosive play in a passing situation.";
+    } else if (downDistance === "short") {
+      detail += "First read is often a quick option to stay on schedule.";
+    } else if (downDistance === "redzone") {
+      detail += "Route stems must be precise with the end line acting as a 12th defender.";
+    } else {
+      detail += "Useful on standard downs when you want a shot with built-in outlets.";
+    }
+
+  } else {
+    // Trick plays
+    detail =
+      concept +
+      " built off a look the defense has already seen earlier in the game. ";
+    detail +=
+      "The initial action sells the base run or screen before revealing the trick. ";
+
+    if (downDistance === "redzone") {
+      detail +=
+        "Risk–reward is high in the red zone; timing and execution have to be perfect.";
+    } else if (downDistance === "long") {
+      detail +=
+        "Can flip the game if the defense overplays your base tendencies on 3rd & long.";
+    } else {
+      detail += "Best used after a successful base play to punish over-aggressive defenders.";
+    }
+  }
+
+  return detail;
+}
+
+
+    function buildNote(conceptType, isHome) {
+      const crowd = isHome
+        ? "ROC section is on its feet behind the offense."
+        : "Crowd noise is heavy, communication has to be clear.";
+
+      if (conceptType === "run") {
+        return (
+          "Emphasize cadence and ball security — " +
+          crowd +
+          " Finish the run falling forward."
+        );
+      }
+      if (conceptType === "pass") {
+        return (
+          "QB must stay poised in the pocket and take what the defense gives. " +
+          crowd
+        );
+      }
+      return (
+        "Everyone on offense must sell the base play before the ball reverses course. " +
+        crowd
+      );
+    }
+
+    function updateDiagram(conceptType, motionText, directionText) {
+      const motionArrow = document.getElementById("motionArrow");
+      const routeArrow = document.getElementById("routeArrow");
+      const caption = document.getElementById("diagramCaption");
+
+      // Simple point: we only tweak positions and text; the diagram is not literal.
+      if (motionText.includes("Jet")) {
+        motionArrow.style.left = "18%";
+        motionArrow.style.top = "22%";
+      } else if (motionText.includes("Orbit")) {
+        motionArrow.style.left = "60%";
+        motionArrow.style.top = "25%";
+      } else if (motionText.includes("RB fast")) {
+        motionArrow.style.left = "45%";
+        motionArrow.style.top = "48%";
+      } else {
+        motionArrow.style.left = "10%";
+        motionArrow.style.top = "60%";
+      }
+
+      if (conceptType === "run") {
+        routeArrow.style.left = directionText.includes("field") ? "70%" : "30%";
+        routeArrow.style.top = "55%";
+      } else if (conceptType === "pass") {
+        routeArrow.style.left = "70%";
+        routeArrow.style.top = "35%";
+      } else {
+        routeArrow.style.left = "50%";
+        routeArrow.style.top = "25%";
+      }
+
+      caption.textContent =
+        "Simplified look at how the formation, motion, and concept are stressing the defense: " +
+        motionText +
+        " with the core concept " +
+        directionText +
+        ".";
+    }
+
+    // ---------- Main generator ----------
+
+    const generateBtn = document.getElementById("generateBtn");
+    const tendencySelect = document.getElementById("tendency");
+    const downSelect = document.getElementById("downDistance");
+    const isHomeCheckbox = document.getElementById("isHome");
+
+    const playMainEl = document.getElementById("playMain");
+    const playTagsEl = document.getElementById("playTags");
+    const playDetailEl = document.getElementById("playDetail");
+    const playNoteEl = document.getElementById("playNote");
+
+    generateBtn.addEventListener("click", () => {
+      const tendency = tendencySelect.value;
+      const downDistance = downSelect.value;
+      const isHome = isHomeCheckbox.checked;
+
+      const formation = rand(formations);
+      const motion = rand(motions);
+      const { type: conceptType, concept } = chooseConcept(tendency);
+      const direction = chooseDirection(conceptType);
+      const name = rand(playNames);
+
+      const playMain =
+        formation + " · " + concept + " " + direction + ' – "' + name + '"';
+
+      const situationText = buildSituationText(downDistance, isHome);
+      const detailText = buildDetail(
+        conceptType,
+        concept,
+        motion,
+        direction,
+        downDistance
+      );
+      const noteText = buildNote(conceptType, isHome);
+
+      // Update text
+      playMainEl.textContent = playMain;
+
+      // Tags
+      playTagsEl.innerHTML = "";
+      const mainTag = document.createElement("span");
+      mainTag.className =
+        "tag " +
+        (conceptType === "run"
+          ? "run"
+          : conceptType === "pass"
+          ? "pass"
+          : "trick");
+      mainTag.textContent =
+        conceptType === "run"
+          ? "Run"
+          : conceptType === "pass"
+          ? "Pass"
+          : "Trick";
+      playTagsEl.appendChild(mainTag);
+
+      const downTag = document.createElement("span");
+      downTag.className = "tag";
+      downTag.textContent = downDistanceLabels[downDistance] || "Any Down";
+      playTagsEl.appendChild(downTag);
+
+      const homeTag = document.createElement("span");
+      homeTag.className = "tag";
+      homeTag.textContent = isHome ? "Home · LES" : "Road Game";
+      playTagsEl.appendChild(homeTag);
+
+      playDetailEl.textContent = detailText;
+      playNoteEl.textContent = situationText + " " + noteText;
+
+      // Update diagram caption + arrows
+      updateDiagram(conceptType, motion, direction);
+    });
+  </script>
+</body>
+</html>
